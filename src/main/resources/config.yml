@@ -1,0 +1,181 @@
+# =====================================================
+#  Immersive Health System — global configuration
+# =====================================================
+
+# Active language for in-game messages, GUI labels and command output.
+# Bundled values: ru, en. Drop a custom lang/messages_<code>.yml into the
+# plugin folder to add your own locale.
+language: ru
+
+# Modules can be individually disabled.
+modules:
+  disease: true
+  medicine: true
+  laboratory: true
+
+# Global behaviour for the disease subsystem.
+disease:
+  # Plugin only acts on players. Other entities are ignored entirely.
+  affect_players_only: true
+
+  # Base disease scale growth per Minecraft day (24000 ticks).
+  base_growth_per_day: 1.0
+
+  # Optional extra growth applied when a player is unhealthy.
+  growth_modifiers:
+    low_health:
+      # If health/maxHealth is below this fraction, apply extra growth.
+      threshold: 0.5
+      add: 0.5
+    low_hunger:
+      # If food level is at or below this value, apply extra growth.
+      threshold: 6
+      add: 0.5
+
+  # Reset all infections and the scale to zero on death.
+  reset_on_death: true
+
+  # Stage thresholds used to evaluate the player's symptoms.
+  # Keep ranges contiguous; the last entry must end at or above 99.
+  stages:
+    incubation: { min: 1,   max: 10  }
+    stage_1:    { min: 11,  max: 30  }
+    stage_2:    { min: 31,  max: 50  }
+    stage_3:    { min: 51,  max: 70  }
+    pre_death:  { min: 71,  max: 99  }
+    death:      { min: 100, max: 100 }
+
+  # How often the global infection roll is performed (in ticks).
+  global_infection_check_period_ticks: 24000
+
+  # Direct-hit transmission boost (added to the base radius chance).
+  direct_hit_bonus_percent: 50.0
+
+  # Particle hitbox radius used when a transmission particle is checked
+  # against nearby players (in blocks).
+  particle_hit_radius: 0.6
+
+  # Vomit phantom block lifetime in seconds.
+  vomit_block_lifetime_seconds: 3
+
+  # Disease scale at which "tremor" (camera shake / minor disorientation)
+  # starts being applied. Per-disease override goes in infections.yml ->
+  # <disease>.tremor_threshold. Set to -1 (or above 100) to disable.
+  tremor_threshold: 50
+
+  # Cumulative scale-decrease (in points) caused by medicine after which
+  # the player receives a "you feel a bit better" message. Reset whenever
+  # the player has no active infections.
+  relief_message_step: 10
+
+  # Symptom event sound configuration. Each entry is parsed as a Sound key
+  # ("CATEGORY:KEY:VOLUME:PITCH"). Custom sounds bundled in the resource
+  # pack can be referenced as namespaced keys (e.g. "ihs:cough").
+  sounds:
+    cough: { id: "ihs:cough", volume: 1.0, pitch: 1.0 }
+    sneeze: { id: "ihs:sneeze", volume: 1.0, pitch: 1.0 }
+    vomit: { id: "minecraft:entity.player.hurt", volume: 0.7, pitch: 0.6 }
+    cough_blood: { id: "ihs:cough", volume: 1.0, pitch: 0.7 }
+
+  # /spit command settings.
+  spit:
+    enabled: true
+    range_blocks: 6.0
+    cooldown_seconds: 4
+    direct_chance_bonus_percent: 75.0
+
+medicine:
+  # Disable the vanilla "milk bucket clears all effects" behaviour.
+  disable_vanilla_milk_clear: true
+  # The PersistentDataContainer key used to mark medicine items.
+  pdc_namespace: "ihs"
+  pdc_medicine_key: "medicine_id"
+
+laboratory:
+  # Material the plugin places when a laboratory item is set down.
+  # The plugin's resourcepack ships an override at
+  #   assets/minecraft/blockstates/note_block.json
+  # that maps note_block[note=0,instrument=harp,powered=false] to the
+  # IHS laboratory model, and the place handler swaps the placed block
+  # to that exact note-block state. The held/inventory item still uses
+  # this material as its base so vanilla clients (no resourcepack)
+  # see something metallic and the block is mined with a pickaxe.
+  block_material: BLAST_FURNACE
+  # CustomModelData applied to the placeable laboratory item (legacy).
+  # New clients (1.21.4+) instead bind to the item-model component below.
+  item_custom_model_data: 9001
+  # Vanilla 1.21.4+ item-model component. Points to a model file shipped
+  # in the resourcepack — assets/<namespace>/models/<path>.json. This is
+  # how the held/inventory laboratory item gets its custom model without
+  # any CraftEngine binding.
+  item_model: "ihs:block/laboratory"
+  # Tick period for the queue/output loop.
+  tick_period_ticks: 20
+  # Fuel definitions. Each material is consumed instantly when dropped
+  # into the fuel slot and converted into "energy units" (1 unit = 1
+  # crafted medicine). Tweak per-material to make rare fuels worth more.
+  fuels:
+    # Maximum energy a laboratory's reserve can hold. Once the reserve
+    # hits this number, additional fuel items are bounced back into the
+    # player's inventory and the player gets the lab.energy_full message.
+    max_energy: 256
+    MOSS_BLOCK:
+      energy_per_item: 1
+    PALE_MOSS_BLOCK:
+      energy_per_item: 2
+  # GUI layout (double chest, 54 slots). Defaults match the in-game
+  # blueprint: 3x3 ingredient grid on the left, progress bar in the
+  # middle, result preview on the right with confirm checkmark below,
+  # fuel slot under progress, recipe book in the bottom-left corner.
+  gui:
+    size: 54
+    input_slots: [10, 11, 12, 19, 20, 21, 28, 29, 30]
+    progress_slot: 23
+    result_slot: 25
+    confirm_slot: 34
+    fuel_slot: 41
+    recipe_book_slot: 45
+    border_filler_material: GREEN_STAINED_GLASS_PANE
+    confirm_button_material: LIME_STAINED_GLASS_PANE
+    confirm_disabled_material: GRAY_STAINED_GLASS_PANE
+    progress_idle_material: GRAY_STAINED_GLASS_PANE
+    progress_active_material: LIME_STAINED_GLASS_PANE
+    recipe_book_material: KNOWLEDGE_BOOK
+    fuel_empty_material: GRAY_STAINED_GLASS_PANE
+
+  # Recipe book GUI (the in-lab medicine catalog).
+  recipe_book:
+    title: ""             # uses lab.recipe_book.title from the locale bundle
+    size: 54
+    page_size: 28
+    list_slots: [10, 11, 12, 13, 14, 15, 16,
+                 19, 20, 21, 22, 23, 24, 25,
+                 28, 29, 30, 31, 32, 33, 34,
+                 37, 38, 39, 40, 41, 42, 43]
+    prev_slot: 45
+    next_slot: 53
+    close_slot: 49
+    locked_material: BARRIER
+    # When true, recipes flagged `visible_by_default: false` show up in
+    # the catalogue as locked "?" stubs (so players know more recipes
+    # exist). When false, hidden recipes are completely omitted —
+    # players cannot tell how many secret recipes there are.
+    show_locked_entries: true
+
+# CraftEngine pack injector. When CraftEngine is present, the plugin will
+# extract its bundled visual/sound pack into the chosen target folder so
+# the laboratory texture, sounds.json and custom block model resolve at
+# runtime.
+craft_engine:
+  inject_pack: true
+  # Folder to drop the IHS pack into, relative to plugins/CraftEngine/.
+  target_folder: "resources/immersive_health"
+  # Force overwrite the pack on every server start. Default true so the
+  # bundled textures, models and sound files always reflect what shipped
+  # in the plugin jar — flip to false if you intend to hand-edit any
+  # files inside <target_folder>.
+  force_overwrite: true
+
+# /ihs menu options.
+menu:
+  size: 54

@@ -1,0 +1,189 @@
+infections:
+
+  cold:
+    name: "Простуда"
+    type: global
+    cure_type: viral
+    infection_chance: 0.1
+    transmission:
+      cough:
+        radius: 6.0
+        chance_radius: 30.0
+        chance_direct: 50.0
+      sneeze:
+        radius: 6.0
+        chance_radius: 30.0
+        chance_direct: 50.0
+    stages:
+      '11-30':
+        messages: ["&o&7Ваш персонаж чувствует себя неважно"]
+        effects: ["WEAKNESS:0"]
+        events: ["cough:10m"]
+      '31-50':
+        messages: ["&o&7Ваш персонаж чувствует себя плохо"]
+        effects: ["WEAKNESS:1"]
+        events: ["cough:10m", "sneeze:12m"]
+      '51-70':
+        messages: ["&o&7Ваш персонаж чувствует себя &4ужасно"]
+        effects: ["WEAKNESS:1", "SLOWNESS:0"]
+        events: ["cough:5m", "effect_blindness:0:10s:5m", "effect_nausea:0:10s:5m"]
+      '71-99':
+        messages: ["&o&4Ваш персонаж в агонии"]
+        effects: ["WEAKNESS:4", "SLOWNESS:4"]
+        events: ["cough:1m"]
+      '100':
+        titles: ["&o&7Ваш персонаж испускает последний вздох"]
+        actions: ["kill"]
+
+  tuberculosis:
+    name: "Туберкулёз"
+    type: global
+    cure_type: bacterial
+    infection_chance: 0.2
+    transmission:
+      cough:
+        radius: 6.0
+        chance_radius: 40.0
+        chance_direct: 60.0
+      cough_blood:
+        radius: 6.0
+        chance_radius: 40.0
+        chance_direct: 60.0
+    stages:
+      '11-30':
+        messages: ["&o&7Вы чувствуете себя неважно"]
+        effects: ["WEAKNESS:0"]
+        events: ["cough:10m"]
+      '31-50':
+        messages: ["&o&7Вы чувствуете себя плохо"]
+        effects: ["WEAKNESS:1"]
+        events: ["cough_blood:5m"]
+      '51-70':
+        messages: ["&o&7Вы чувствуете себя ужасно"]
+        effects: ["WEAKNESS:1", "SLOWNESS:0"]
+        events: ["cough_blood:5m"]
+      '71-99':
+        messages: ["&o&4Вы в агонии"]
+        effects: ["WEAKNESS:3", "SLOWNESS:3"]
+        events: ["cough_blood:1m"]
+      '100':
+        titles: ["&o&7Вы испускаете свой последний вздох"]
+        actions: ["kill"]
+
+  measles:
+    name: "Корь"
+    type: global
+    cure_type: viral
+    infection_chance: 0.1
+    transmission:
+      cough:
+        radius: 10.0
+        chance_radius: 60.0
+        chance_direct: 90.0
+      sneeze:
+        radius: 10.0
+        chance_radius: 60.0
+        chance_direct: 90.0
+    stages:
+      '11-30':
+        messages: ["&o&7Вы чувствуете себя неважно"]
+        effects: ["WEAKNESS:0"]
+        events: ["cough:9m", "sneeze:13m", "effect_blindness:0:5s:6m"]
+      '31-50':
+        messages: ["&o&7Вы чувствуете себя плохо"]
+        effects: ["WEAKNESS:1"]
+        events: ["cough:7m", "sneeze:9m", "effect_blindness:0:8s:5m"]
+      '51-70':
+        messages: ["&o&7Вы чувствуете себя ужасно"]
+        effects: ["WEAKNESS:1", "SLOWNESS:1"]
+        events: ["cough:5m", "sneeze:4m", "effect_blindness:0:15s:2m"]
+      '71-99':
+        messages: ["&o&4Вы в агонии"]
+        effects: ["WEAKNESS:4", "SLOWNESS:4", "BLINDNESS:0"]
+      '100':
+        titles: ["&o&7Вы испускаете свой последний вздох"]
+        actions: ["kill"]
+
+  pertussis:
+    name: "Коклюш"
+    type: global
+    cure_type: bacterial
+    infection_chance: 0.1
+    transmission:
+      cough:
+        radius: 6.0
+        chance_radius: 30.0
+        chance_direct: 50.0
+      sneeze:
+        radius: 6.0
+        chance_radius: 30.0
+        chance_direct: 50.0
+    stages:
+      '11-30':
+        messages: ["&o&7Вы чувствуете себя неважно"]
+        effects: ["WEAKNESS:0"]
+        events: ["cough:5m", "sneeze:10m"]
+      '31-50':
+        messages: ["&o&7Вы чувствуете себя плохо"]
+        effects: ["WEAKNESS:1"]
+        events: ["cough:1m", "effect_slowness:14:10s:10m"]
+      '51-70':
+        messages: ["&o&7Вы чувствуете себя ужасно"]
+        effects: ["WEAKNESS:1", "SLOWNESS:1"]
+        events: ["cough:1m"]
+      '71-99':
+        messages: ["&o&4Вы в агонии"]
+        effects: ["WEAKNESS:4", "SLOWNESS:4", "DARKNESS:0"]
+        events: ["cough:1m"]
+      '100':
+        titles: ["&o&7Вы испускаете свой последний вздох"]
+        actions: ["kill"]
+
+  brain_cancer:
+    name: "Рак мозга"
+    type: global
+    cure_type: oncological
+    infection_chance: 0.001
+    transmission: {}
+    stages:
+      '11-30':
+        messages: ["&o&7Вы чувствуете головную боль"]
+        effects: ["WEAKNESS:0"]
+        events: ["effect_slowness:14:10s:30m"]
+      '31-50':
+        messages: ["&o&7Вы чувствуете сильную головную боль"]
+        effects: ["WEAKNESS:1"]
+        events: ["effect_slowness:14:15s:30m"]
+      '51-70':
+        messages: ["&o&7Вы чувствуете нестерпимую головную боль"]
+        effects: ["WEAKNESS:1", "SLOWNESS:1"]
+        events: ["effect_darkness:0:60s:5m", "sound_entity.warden.heartbeat:1m"]
+      '71-99':
+        messages: ["&o&4Вы в агонии"]
+        effects: ["WEAKNESS:9", "SLOWNESS:19", "DARKNESS:0", "BLINDNESS:0"]
+      '100':
+        titles: ["&o&7Вы испускаете свой последний вздох"]
+        actions: ["kill"]
+
+  necrovirus:
+    name: "Некровирус"
+    type: local
+    cure_type: viral
+    infection_chance: 0.0
+    transmission: {}
+    stages:
+      '11-30':
+        messages: ["&o&7Вы чувствуете нескончаемый голод"]
+        effects: ["HUNGER:0"]
+      '31-50':
+        messages: ["&o&7Вы чувствуете нестерпимое желание съесть плоть человека"]
+        effects: ["HUNGER:2"]
+      '51-70':
+        messages: ["&o&7Вы невероятно голодны и хотите есть людей"]
+        effects: ["HUNGER:9", "STRENGTH:0"]
+      '71-99':
+        messages: ["&4Вы перестаёте что-либо понимать"]
+        effects: ["HUNGER:9", "STRENGTH:1"]
+      '100':
+        titles: ["&o&7Вы испускаете свой последний осознаваемый вздох"]
+        actions: ["spawn_zombie", "kill"]

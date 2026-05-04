@@ -1,0 +1,119 @@
+medicines:
+
+  antiviral_pills:
+    material: GOLDEN_APPLE
+    custom_model_data: 1001
+    name: "&aПротивовирусные таблетки"
+    lore:
+      - "&7Эффективное лекарство против вирусных заболеваний."
+      - "&7Можно принимать до 3-ёх раз в день."
+    medicine_data:
+      type: cure
+      cures_infections: ["cold", "measles"]
+      heal_points: 4
+      daily_limit: 3
+
+  antibiotics:
+    material: GOLDEN_APPLE
+    custom_model_data: 1002
+    name: "&bАнтибиотики"
+    lore:
+      - "&7Эффективное лекарство против бактериальных заболеваний."
+      - "&7Можно принимать до 3-ёх раз в день."
+    medicine_data:
+      type: cure
+      cures_infections: ["tuberculosis", "pertussis"]
+      heal_points: 5
+      daily_limit: 3
+
+  activated_carbon:
+    material: GOLDEN_APPLE
+    custom_model_data: 1003
+    name: "&8Активированный уголь"
+    lore:
+      - "&7Эффективное лекарство против отравления."
+      - "&7Можно принимать до 10-и раз в день."
+    medicine_data:
+      type: effect_clear
+      clears_potion_effects: ["POISON"]
+      daily_limit: 10
+
+  uranium_pill:
+    material: GOLDEN_APPLE
+    custom_model_data: 1004
+    name: "&2Урановая таблетка"
+    lore:
+      - "&7Целая радиотерапия в одной таблетке."
+      - "&7Можно принимать до 2-ух раз в день."
+    medicine_data:
+      type: cure
+      cures_infections: ["brain_cancer"]
+      heal_points: 5
+      daily_limit: 2
+
+  antidepressants:
+    material: GOLDEN_APPLE
+    custom_model_data: 1005
+    name: "&eАнтидепрессанты"
+    lore:
+      - "&7Лекарственный препарат для лечения психических заболеваний."
+      - "&7Можно принимать до 2-ух раз в день."
+    medicine_data:
+      type: cure
+      cures_infections: ["depression", "panic_attacks"]
+      heal_points: 4
+      daily_limit: 2
+
+  sleeping_pills:
+    material: GOLDEN_APPLE
+    custom_model_data: 1006
+    name: "&9Снотворное"
+    lore:
+      - "&7Препарат для лечения бессонницы."
+      - "&7Принимать по 1 таблетке перед сном."
+    medicine_data:
+      type: cure
+      cures_infections: ["insomnia"]
+      heal_points: 10
+      daily_limit: 1
+
+  tranquilizer:
+    material: GOLDEN_APPLE
+    custom_model_data: 1007
+    name: "&cТранквилизатор"
+    lore:
+      - "&7Препарат для мгновенного усыпления."
+    medicine_data:
+      type: buff
+      apply_potion_effects:
+        - "BLINDNESS:0:120"
+        - "SLOWNESS:10:120"
+        - "WEAKNESS:10:120"
+      daily_limit: 1
+
+  panacea_lav14:
+    material: GOLDEN_APPLE
+    custom_model_data: 1008
+    name: "&6Сыворотка Л.А.В.-14"
+    lore:
+      - "&7Панацея от компании BioNTech."
+      - "&7Способна истребить любой вид патогена."
+    medicine_data:
+      type: cure
+      cures_infections: ["ALL"]
+      heal_points: 100
+      daily_limit: 1
+
+  adrenaline:
+    material: HONEY_BOTTLE
+    custom_model_data: 1009
+    name: "&4Адреналин"
+    lore:
+      - "&7Временный стимулятор."
+      - "&7Даёт Скорость 2 и Прыгучесть 2 на 2 минуты."
+    medicine_data:
+      type: buff
+      apply_potion_effects:
+        - "SPEED:1:120"
+        - "JUMP_BOOST:1:120"
+      daily_limit: 5

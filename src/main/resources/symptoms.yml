@@ -1,0 +1,121 @@
+# ============================================================================
+#  IHS — Symptom events (cough / sneeze / spit / vomit / cough_blood)
+# ----------------------------------------------------------------------------
+#  Полная настройка визуала, звука и радиуса заражения для каждого события.
+#  Путь сигнатуры Particle — это константа org.bukkit.Particle (UPPER_SNAKE).
+#  Сигнатура Sound — строковый Minecraft namespaced key
+#  (например "minecraft:entity.fox.spit", "ihs:cough").
+#
+#  Ключ `sound.custom` используется для клиентов с ресурспаком IHS (см. ниже
+#  `resource_pack_detection`). `sound.vanilla` — fallback без пака.
+#
+#  Ключи `transmission.*` — настройки распространения заболевания (радиус,
+#  шансы). Если заболевание само декларирует свои `transmissions`,
+#  они перекрывают дефолты отсюда. Это общий потолок для всех болезней,
+#  у которых событие не задано явно.
+# ============================================================================
+
+resource_pack_detection:
+  # Если true — плагин слушает PlayerResourcePackStatusEvent и если у игрока
+  # пак успешно загружен, ему играются custom-звуки (ihs:cough / ihs:sneeze).
+  # Если false — всем всегда играет vanilla.
+  enabled: true
+
+  # Сколько миллисекунд после события ACCEPTED ждать SUCCESSFULLY_LOADED перед
+  # тем как считать что пак действительно доставлен. Если клиент прислал
+  # ACCEPTED но не SUCCESSFULLY_LOADED (отвалился на загрузке) — считаем что
+  # пака нет. 0 = не ждать (ACCEPTED сразу засчитывается).
+  grace_period_ms: 3000
+
+events:
+
+  cough:
+    particle:
+      # Основной partic-облачок перед лицом.
+      type: CLOUD
+      count: 12
+      offset_x: 0.08
+      offset_y: 0.08
+      offset_z: 0.08
+      speed: 0.02
+      # Смещение точки спавна от глаз по направлению взгляда.
+      forward_offset: 0.35
+    sound:
+      vanilla: "minecraft:entity.fox.spit"
+      custom:  "ihs:cough"
+      volume: 1.0
+      pitch: 0.9
+
+  sneeze:
+    particle:
+      type: SNEEZE
+      count: 3
+      offset_x: 0.1
+      offset_y: 0.1
+      offset_z: 0.1
+      speed: 0.05
+      # Для sneeze партиклы спавнятся серией вдоль конуса.
+      cone_steps: 8
+      cone_step_length: 0.5
+      forward_offset: 0.4
+    sound:
+      vanilla: "minecraft:entity.panda.sneeze"
+      custom:  "ihs:sneeze"
+      volume: 1.0
+      pitch: 1.1
+
+  spit:
+    particle:
+      type: SPIT
+      count: 1
+      offset_x: 0.0
+      offset_y: 0.0
+      offset_z: 0.0
+      speed: 0.05
+      cone_steps: 10
+      cone_step_length: 0.4
+    sound:
+      vanilla: "minecraft:entity.llama.spit"
+      custom:  "ihs:spit"
+      volume: 0.8
+      pitch: 1.4
+
+  cough_blood:
+    particle:
+      type: DUST
+      count: 4
+      offset_x: 0.1
+      offset_y: 0.1
+      offset_z: 0.1
+      speed: 0.0
+      cone_steps: 14
+      cone_step_length: 0.3
+      # DUST requires a color + size. RGB в 0..255.
+      dust_color: [255, 0, 0]
+      dust_size: 1.0
+    sound:
+      vanilla: "minecraft:entity.fox.spit"
+      custom:  "ihs:cough_blood"
+      volume: 1.0
+      pitch: 0.7
+
+  vomit:
+    # vomit использует FallingBlock (SLIME_BLOCK) — партикл тут
+    # только вторичная косметика, её можно отключить через count: 0.
+    particle:
+      type: ITEM_SLIME
+      count: 6
+      offset_x: 0.15
+      offset_y: 0.1
+      offset_z: 0.15
+      speed: 0.1
+      forward_offset: 0.2
+    sound:
+      vanilla: "minecraft:entity.player.hurt"
+      custom:  "ihs:vomit"
+      volume: 0.7
+      pitch: 0.6
+    # Сколько тиков живёт заспавненный falling_block перед принудительным удалением.
+    # Дублируется в config.yml (disease.vomit_block_lifetime_seconds) — этот
+    # ключ выигрывает, если задан.
+    block_lifetime_seconds: 3

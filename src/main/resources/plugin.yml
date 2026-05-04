@@ -1,0 +1,40 @@
+name: ImmersiveHealthSystem
+version: ${project.version}
+main: com.tnhzr.ihs.ImmersiveHealthSystem
+api-version: '1.21'
+author: tnhzr
+description: Modular disease, medicine and laboratory system.
+softdepend: [CraftEngine]
+commands:
+  ihs:
+    description: Root command for the Immersive Health System.
+    usage: /ihs help
+    aliases: [health, immersivehealth]
+  spit:
+    description: Spit at the player you are looking at.
+    usage: /spit
+  cough:
+    description: (Admin) trigger a cough event.
+    usage: /cough [player]
+  sneeze:
+    description: (Admin) trigger a sneeze event.
+    usage: /sneeze [player]
+  vomit:
+    description: (Admin) trigger a vomit event.
+    usage: /vomit [player]
+permissions:
+  ihs.admin:
+    description: Full administrative access.
+    default: op
+  ihs.menu:
+    description: Open the player health menu.
+    default: op
+  ihs.spit:
+    description: Use the /spit command.
+    default: true
+  ihs.debug.symptom:
+    description: Use /cough, /sneeze, /vomit for debugging.
+    default: op
+  ihs.give:
+    description: Use /ihs give to spawn medicine items.
+    default: op

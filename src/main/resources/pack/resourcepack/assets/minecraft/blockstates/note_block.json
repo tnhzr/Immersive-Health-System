@@ -1,0 +1,11 @@
+{
+    "_comment": "IHS resourcepack override. Vanilla note_block uses an empty variant '' as a catch-all for every state combination, so we keep that and add a single override for the state IHS pins its laboratory block to. All other note_block placements (regular vanilla note blocks) keep their default model.",
+    "variants": {
+        "": {
+            "model": "minecraft:block/note_block"
+        },
+        "instrument=harp,note=0,powered=false": {
+            "model": "ihs:block/laboratory"
+        }
+    }
+}

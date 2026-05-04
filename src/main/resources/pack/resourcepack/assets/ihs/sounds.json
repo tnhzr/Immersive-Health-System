@@ -1,0 +1,32 @@
+{
+  "cough": {
+    "subtitle": "ihs.subtitle.cough",
+    "sounds": [
+      { "name": "ihs:cough", "stream": false }
+    ]
+  },
+  "sneeze": {
+    "subtitle": "ihs.subtitle.sneeze",
+    "sounds": [
+      { "name": "ihs:sneeze", "stream": false }
+    ]
+  },
+  "spit": {
+    "subtitle": "ihs.subtitle.spit",
+    "sounds": [
+      { "name": "ihs:spit", "stream": false }
+    ]
+  },
+  "cough_blood": {
+    "subtitle": "ihs.subtitle.cough_blood",
+    "sounds": [
+      { "name": "ihs:cough_blood", "stream": false }
+    ]
+  },
+  "vomit": {
+    "subtitle": "ihs.subtitle.vomit",
+    "sounds": [
+      { "name": "ihs:vomit", "stream": false }
+    ]
+  }
+}

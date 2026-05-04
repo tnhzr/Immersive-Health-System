@@ -1,0 +1,125 @@
+# =====================================================
+#  Immersive Health System — русская локализация
+# =====================================================
+# Поддерживаются legacy цвета через '&' и плейсхолдеры
+# вида {placeholder}. Чтобы добавить свой язык, скопируйте
+# этот файл в lang/messages_<код>.yml и переключите
+# параметр language в config.yml.
+#
+# Стилистика — Pip-Boy: преимущественно зелёные оттенки
+# (&a светло-зелёный, &2 тёмно-зелёный, &7 серый,
+# &8 тёмно-серый, &c красный для критических ошибок).
+
+# Префикс приклеивается ко всем игровым сообщениям через LocaleManager#send.
+# Формат FlextonPulse-стиль: «IHS &8» &7<сообщение>». Тёмно-серая стрелка не
+# затрагивает следующий за ней текст — каждое сообщение само решает, какие
+# цвета задать в своём теле.
+prefix: "&aIHS &8» &r"
+
+common:
+  no_permission: "&cНет прав для этой команды."
+  player_not_found: "&cИгрок не найден."
+  only_players: "&cЭту команду может использовать только игрок."
+  reload_done: "&aКонфигурация перезагружена."
+
+ihs:
+  help:
+    - "&8»&a /ihs check &7<игрок|uuid> [scale|infection]"
+    - "&8»&a /ihs inject &7<игрок|uuid> <id_болезни> [шанс]"
+    - "&8»&a /ihs heal &7<игрок|uuid> [id_болезни]"
+    - "&8»&a /ihs modify &7<игрок|uuid> <значение>"
+    - "&8»&a /ihs give &7<игрок> <id_препарата> [кол-во]"
+    - "&8»&a /ihs tremor &7<игрок> [сек]  &8(дебаг визуала тремора)"
+    - "&8»&a /ihs menu"
+    - "&8»&a /ihs reload"
+    - "&8»&a /cough &7| /sneeze | /vomit  &8(требует &aihs.debug.symptom&8)"
+  infection_unknown: "&cНеизвестная болезнь: &f{id}"
+  medicine_unknown: "&cНеизвестный препарат: &f{id}"
+  player_healthy: "&aИгрок &f{player} &7здоров."
+  player_sick: "&7Игрок &f{player} &7болен — &a{infection} &7(стадия &2{stage}&7)"
+  scale_view: "&7Шкала болезни игрока &f{player} &7- &a{value}"
+  scale_set: "&aУстановлено значение шкалы &f{value} &aдля игрока &f{player}&a."
+  injected: "&aИгрок &f{player} &aзаражён болезнью &2{infection}&a."
+  injected_failed: "&7Шанс заражения не сработал."
+  healed_all: "&aИгрок &f{player} &aполностью излечён."
+  healed_one: "&aИгрок &f{player} &aизлечен от &2{infection}&a."
+  give_done: "&aВыдано &f{count}× {medicine} &aигроку &f{player}&a."
+  debug:
+    symptom_fired: "&aСобытие &2{event} &aпроиграно для &f{player}&a."
+
+spit:
+  cooldown: "&cПодождите &f{seconds} &cсек."
+
+medicine:
+  overdose: "&cПередозировка! Лечение не сработало."
+  used: "&aВы приняли &f{medicine}&a."
+  relief: "&aВы чувствуете, что вам стало легче ({infection})."
+
+lab:
+  item_name: "&aЛаборатория"
+  no_fuel: "&cНет топлива."
+  queue_full: "&cОчередь занята другим рецептом."
+  no_recipe: "&cНевалидный рецепт."
+  queue_cancelled: "&aСинтез отменён, ингредиенты возвращены."
+  fuel_credited: "&aТопливо переработано: &f+{count}&a единиц энергии."
+  energy_full: "&cЭнергорезерв заполнен (&f{max}&c). Топливо больше не принимается."
+  gui:
+    title: "&2▌ &aЛаборатория &2▌"
+    preview_empty: "&7Сложи ингредиенты в сетку 3×3"
+    preview_unknown: "&cНеизвестный результат: &f{id}"
+    preview_header: "&8» &7Превью результата"
+    preview_time: "&7Время крафта: &a{seconds} с."
+    queue_label: "&7В очереди: &a{count}"
+    confirm_name: "&a✔ Подтвердить"
+    confirm_lore: "&7Списать ингредиенты и запустить синтез."
+    confirm_disabled_name: "&8✘ Подтверждение"
+    confirm_disabled_lore: "&7Сначала выложи &fвалидный рецепт&7 в сетку."
+    progress_title: "&a⏵ Прогресс"
+    progress_energy: "&7Энергия: &a{energy}"
+    progress_crafts_possible: "&7Хватит на ещё &a{count}&7 препарата(ов)."
+    progress_fuel_header: "&8» &7Топливо:"
+    progress_fuel_line: "&8• &f{material} &7→ &a{energy}&7 крафта(ов)"
+    progress_active: "&7Синтез: &f{recipe}"
+    progress_remaining: "&7Осталось: &a{seconds} с."
+    progress_queue: "&7В очереди: &a{count}"
+    progress_idle_hint: "&8» Положи топливо и нажми &a✔ Подтвердить&8."
+    progress_cancel_hint: "&7Shift+ПКМ &8— &cотменить и вернуть ингредиенты."
+    fuel_empty_name: "&8☼ Слот топлива"
+    fuel_empty_line: "&8• &f{material} &7→ &a{energy} крафта(ов)"
+    fuel_empty_hint: "&7Топливо тратится &fмгновенно&7 в энергорезерв."
+    recipe_book_name: "&a📖 Каталог рецептов"
+    recipe_book_lore:
+      - "&7Открой список доступных"
+      - "&7рецептов медикаментов."
+      - ""
+      - "&8Клик по рецепту &8— &7визуальная страница."
+  recipe_book:
+    title: "&2▌ &aКаталог рецептов &2▌"
+    prev: "&a« Назад"
+    next: "&aДалее »"
+    close: "&cЗакрыть"
+    locked_name: "&8❓ Неизвестный рецепт"
+    locked_lore: "&7Найди этот рецепт сам — экспериментируй с ингредиентами."
+    entry_header: "&8» &7Ингредиенты:"
+    entry_line: "  &8• &f{entry}"
+    entry_time: "&7Время крафта: &a{seconds} с."
+  recipe_detail:
+    title: "&2▌ &aРецепт: &f{medicine}"
+    arrow: "&a➜"
+    back: "&a« К каталогу"
+    meta_title: "&a⏱ Параметры"
+    meta_time: "&7Время крафта: &a{seconds} с."
+    result_header: "&8» &7Результат синтеза"
+    result_time: "&7Время крафта: &a{seconds} с."
+    ingredient_name_vanilla: "&f{material} &7×&a{amount}"
+    ingredient_name_custom: "&f{medicine} &7×&a{amount}"
+    ingredient_option: "&8• &7{source}: &f{id}"
+
+menu:
+  title: "&2▌ &aСостояние игроков &2▌"
+  scale_line: "&7Шкала: &c{value}"
+  healthy_line: "&aЗдоров"
+  infection_line: "&7{infection} &8(&a{stage}&8)"
+  page_indicator: "&7Страница {page}"
+  next_page: "&aСледующая страница"
+  prev_page: "&aПредыдущая страница"

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "ihs:block/laboratory_front",
+    "down":  "ihs:block/laboratory_bottom",
+    "up":    "ihs:block/laboratory_top",
+    "north": "ihs:block/laboratory_front",
+    "south": "ihs:block/laboratory_side",
+    "east":  "ihs:block/laboratory_side",
+    "west":  "ihs:block/laboratory_side"
+  }
+}

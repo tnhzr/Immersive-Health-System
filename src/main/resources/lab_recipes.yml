@@ -1,0 +1,58 @@
+laboratory_recipes:
+
+  antibiotics:
+    ingredients:
+      - "vanilla:honeycomb:1"
+      - "vanilla:red_mushroom:1"
+      - "vanilla:resin_clump:1"
+    craft_time: 12
+
+  antiviral_pills:
+    ingredients:
+      - "vanilla:honeycomb:1"
+      - "vanilla:pitcher_plant:1"
+      - "vanilla:resin_clump:1"
+    craft_time: 12
+
+  uranium_pill:
+    ingredients:
+      - "custom:uranium_shard:1"
+      - "vanilla:echo_shard:1"
+      - "vanilla:resin_clump:1"
+    craft_time: 30
+
+  antidepressants:
+    ingredients:
+      - "vanilla:honeycomb:1"
+      - "vanilla:ghast_tear:1"
+      - "vanilla:resin_clump:1"
+    craft_time: 12
+
+  sleeping_pills:
+    ingredients:
+      - "vanilla:honeycomb:1"
+      - "vanilla:open_eyeblossom:1"
+      - "vanilla:resin_clump:1"
+    craft_time: 14
+
+  tranquilizer:
+    ingredients:
+      - "vanilla:honeycomb:1"
+      - "vanilla:closed_eyeblossom:1"
+      - "vanilla:resin_clump:1"
+    craft_time: 14
+
+  activated_carbon:
+    ingredients:
+      - "vanilla:coal|vanilla:charcoal:1"
+      - "vanilla:redstone:1"
+    craft_time: 8
+
+  adrenaline:
+    ingredients:
+      - "vanilla:glowstone_dust:1"
+      - "vanilla:red_mushroom:1"
+      - "vanilla:rotten_flesh:1"
+      - "vanilla:rabbit_foot:1"
+      - "vanilla:glass_bottle:1"
+    craft_time: 27

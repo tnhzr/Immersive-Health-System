@@ -1,0 +1,124 @@
+# =====================================================
+#  Immersive Health System — English locale
+# =====================================================
+# Legacy '&' colour codes and {placeholder} substitutions
+# are supported. To add a custom language, copy this file
+# to lang/messages_<code>.yml and switch the `language`
+# entry in config.yml.
+#
+# Theme — Pip-Boy: dominantly green (&a light green,
+# &2 dark green, &7 grey, &8 dark grey, &c reserved for
+# critical errors).
+
+# Glued to every chat message routed through LocaleManager#send.
+# FlextonPulse-style format: "IHS » <message>". The dark-grey » does not
+# bleed into the message body — each message decides its own colour.
+prefix: "&aIHS &8» &r"
+
+common:
+  no_permission: "&cYou don't have permission to use this command."
+  player_not_found: "&cPlayer not found."
+  only_players: "&cThis command can only be used by a player."
+  reload_done: "&aConfiguration reloaded."
+
+ihs:
+  help:
+    - "&8»&a /ihs check &7<player|uuid> [scale|infection]"
+    - "&8»&a /ihs inject &7<player|uuid> <infection_id> [chance]"
+    - "&8»&a /ihs heal &7<player|uuid> [infection_id]"
+    - "&8»&a /ihs modify &7<player|uuid> <value>"
+    - "&8»&a /ihs give &7<player> <medicine_id> [count]"
+    - "&8»&a /ihs tremor &7<player> [seconds]  &8(debug tremor visual)"
+    - "&8»&a /ihs menu"
+    - "&8»&a /ihs reload"
+    - "&8»&a /cough &7| /sneeze | /vomit  &8(needs &aihs.debug.symptom&8)"
+  infection_unknown: "&cUnknown infection: &f{id}"
+  medicine_unknown: "&cUnknown medicine: &f{id}"
+  player_healthy: "&aPlayer &f{player} &7is healthy."
+  player_sick: "&7Player &f{player} &7is infected — &a{infection} &7(stage &2{stage}&7)"
+  scale_view: "&7Disease scale of &f{player}&7: &a{value}"
+  scale_set: "&aSet disease scale to &f{value} &afor &f{player}&a."
+  injected: "&aPlayer &f{player} &awas infected with &2{infection}&a."
+  injected_failed: "&7Infection roll failed."
+  healed_all: "&aPlayer &f{player} &awas fully healed."
+  healed_one: "&aPlayer &f{player} &awas cured of &2{infection}&a."
+  give_done: "&aGave &f{count}× {medicine} &ato &f{player}&a."
+  debug:
+    symptom_fired: "&aFired &2{event} &aevent for &f{player}&a."
+
+spit:
+  cooldown: "&cWait &f{seconds} &cs."
+
+medicine:
+  overdose: "&cOverdose! The medicine had no effect."
+  used: "&aYou consumed &f{medicine}&a."
+  relief: "&aYou feel a bit better ({infection})."
+
+lab:
+  item_name: "&aLaboratory"
+  no_fuel: "&cNo fuel."
+  queue_full: "&cQueue is busy with another recipe."
+  no_recipe: "&cInvalid recipe."
+  queue_cancelled: "&aSynthesis cancelled — ingredients refunded."
+  fuel_credited: "&aFuel processed: &f+{count}&a energy units."
+  energy_full: "&cEnergy reserve full (&f{max}&c). Fuel is no longer accepted."
+  gui:
+    title: "&2▌ &aLaboratory &2▌"
+    preview_empty: "&7Place ingredients into the 3×3 grid"
+    preview_unknown: "&cUnknown result: &f{id}"
+    preview_header: "&8» &7Result preview"
+    preview_time: "&7Craft time: &a{seconds}s"
+    queue_label: "&7Queued: &a{count}"
+    confirm_name: "&a✔ Confirm"
+    confirm_lore: "&7Consume ingredients and start synthesis."
+    confirm_disabled_name: "&8✘ Confirm"
+    confirm_disabled_lore: "&7First lay out a &fvalid recipe&7 in the grid."
+    progress_title: "&a⏵ Progress"
+    progress_energy: "&7Energy: &a{energy}"
+    progress_crafts_possible: "&7Enough for &a{count}&7 more medicine(s)."
+    progress_fuel_header: "&8» &7Fuel:"
+    progress_fuel_line: "&8• &f{material} &7→ &a{energy}&7 craft(s)"
+    progress_active: "&7Synthesis: &f{recipe}"
+    progress_remaining: "&7Remaining: &a{seconds}s"
+    progress_queue: "&7Queued: &a{count}"
+    progress_idle_hint: "&8» Drop fuel, then press &a✔ Confirm&8."
+    progress_cancel_hint: "&7Shift+RC &8— &ccancel and refund ingredients."
+    fuel_empty_name: "&8☼ Fuel slot"
+    fuel_empty_line: "&8• &f{material} &7→ &a{energy} craft(s)"
+    fuel_empty_hint: "&7Fuel is consumed &finstantly&7 into the energy reserve."
+    recipe_book_name: "&a📖 Recipe catalog"
+    recipe_book_lore:
+      - "&7Open the catalog of available"
+      - "&7medicine recipes."
+      - ""
+      - "&8Click a recipe &8— &7visual page."
+  recipe_book:
+    title: "&2▌ &aRecipe catalog &2▌"
+    prev: "&a« Prev"
+    next: "&aNext »"
+    close: "&cClose"
+    locked_name: "&8❓ Unknown recipe"
+    locked_lore: "&7Find this recipe yourself — experiment with the ingredients."
+    entry_header: "&8» &7Ingredients:"
+    entry_line: "  &8• &f{entry}"
+    entry_time: "&7Craft time: &a{seconds}s"
+  recipe_detail:
+    title: "&2▌ &aRecipe: &f{medicine}"
+    arrow: "&a➜"
+    back: "&a« Back to catalog"
+    meta_title: "&a⏱ Parameters"
+    meta_time: "&7Craft time: &a{seconds}s"
+    result_header: "&8» &7Synthesis result"
+    result_time: "&7Craft time: &a{seconds}s"
+    ingredient_name_vanilla: "&f{material} &7×&a{amount}"
+    ingredient_name_custom: "&f{medicine} &7×&a{amount}"
+    ingredient_option: "&8• &7{source}: &f{id}"
+
+menu:
+  title: "&2▌ &aPlayer health &2▌"
+  scale_line: "&7Scale: &c{value}"
+  healthy_line: "&aHealthy"
+  infection_line: "&7{infection} &8(&a{stage}&8)"
+  page_indicator: "&7Page {page}"
+  next_page: "&aNext page"
+  prev_page: "&aPrevious page"

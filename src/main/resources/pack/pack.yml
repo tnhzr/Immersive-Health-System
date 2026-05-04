@@ -1,0 +1,18 @@
+# CraftEngine pack metadata.
+#
+# CraftEngine scans plugins/CraftEngine/resources/<dir>/ and treats every
+# subdirectory as an addon "pack". This file is the metadata marker — the
+# field names below are what CE's AbstractPackManager#loadPacks reads
+# (enable, namespace, description, version, author).
+#
+# This addon is used as a pure asset host: every block/item/sound binding
+# is owned directly by the plugin (note_block blockstate override + vanilla
+# item-model component + resourcepack sounds.json). Without this pack.yml
+# CE warns "is not a directory" / "Failed to load resource meta file" and
+# skips the addon, which is what caused the laboratory texture to render
+# as a black cube.
+enable: true
+namespace: ihs
+description: "Immersive Health System bundled visuals & sounds"
+version: "1.0.0"
+author: "tnhzr"
