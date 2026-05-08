@@ -197,18 +197,54 @@ laboratory:
     # players cannot tell how many secret recipes there are.
     show_locked_entries: true
 
-# CraftEngine pack injector. When CraftEngine is present, the plugin will
-# extract its bundled visual/sound pack into the chosen target folder so
-# the laboratory texture, sounds.json and custom block model resolve at
-# runtime.
+# =====================================================
+#  Resourcepack injection
+# =====================================================
+# IHS bundles its own resourcepack (laboratory textures, sounds,
+# medicine models, etc). This section controls how/where that pack is
+# delivered to the client.
+#
+# `installer` selects the strategy:
+#   - auto         pick the first installed host plugin in this order:
+#                  CraftEngine -> ItemsAdder -> Nexo -> Oraxen.
+#                  Falls back to `manual` if none are present.
+#   - craftengine  unpack into plugins/CraftEngine/<target_folder>/
+#                  (configurable below).
+#   - itemsadder   unpack into plugins/ItemsAdder/contents/<namespace>/
+#                  resourcepack/. Run /iazip after the first start.
+#   - nexo         unpack into plugins/Nexo/pack/external_packs/<folder>/.
+#   - oraxen       unpack into plugins/Oraxen/pack/external_packs/<folder>/.
+#   - manual       unpack into plugins/ImmersiveHealthSystem/resourcepack/
+#                  for admins who serve the pack themselves (HTTP, modpack,
+#                  launcher, etc).
+#   - none         skip injection entirely.
+resourcepack:
+  installer: auto
+  # When true, the bundled pack files always overwrite anything already
+  # present in the target folder on each start. Flip to false if you
+  # intend to hand-edit individual textures/sounds in the target folder.
+  force_overwrite: true
+
+  craftengine:
+    # Folder under plugins/CraftEngine/ to drop the IHS pack into.
+    target_folder: "resources/immersive_health"
+  itemsadder:
+    # Namespace folder under plugins/ItemsAdder/contents/.
+    namespace: "ihs"
+  nexo:
+    # Folder under plugins/Nexo/pack/external_packs/.
+    folder: "ihs"
+  oraxen:
+    # Folder under plugins/Oraxen/pack/external_packs/.
+    folder: "ihs"
+
+# Legacy CraftEngine block. Kept for backwards compatibility with
+# 1.0.x configs; new installs should configure `resourcepack:` above.
+# Set craft_engine.inject_pack: false (and resourcepack: absent) to fully
+# disable injection.
 craft_engine:
   inject_pack: true
-  # Folder to drop the IHS pack into, relative to plugins/CraftEngine/.
   target_folder: "resources/immersive_health"
-  # Force overwrite the pack on every server start. Default true so the
-  # bundled textures, models and sound files always reflect what shipped
-  # in the plugin jar — flip to false if you intend to hand-edit any
-  # files inside <target_folder>.
   force_overwrite: true
 
 # /ihs menu options.

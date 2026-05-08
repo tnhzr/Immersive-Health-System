@@ -14,6 +14,7 @@ public final class MedicineManager implements Module {
     private final ImmersiveHealthSystem plugin;
     private final Map<String, Medicine> medicines = new LinkedHashMap<>();
     private final MedicineItemFactory factory;
+    private TranquilizerListener tranquilizer;
 
     public MedicineManager(ImmersiveHealthSystem plugin) {
         this.plugin = plugin;
@@ -30,10 +31,10 @@ public final class MedicineManager implements Module {
         load();
         // Tranquilizer needs to share its sleep routine with the
         // consume listener, so build it first and pass it down.
-        TranquilizerListener tranq = new TranquilizerListener(plugin, this);
+        this.tranquilizer = new TranquilizerListener(plugin, this);
         Bukkit.getPluginManager().registerEvents(
-                new MedicineConsumeListener(plugin, this, tranq), plugin);
-        Bukkit.getPluginManager().registerEvents(tranq, plugin);
+                new MedicineConsumeListener(plugin, this, tranquilizer), plugin);
+        Bukkit.getPluginManager().registerEvents(tranquilizer, plugin);
         Bukkit.getPluginManager().registerEvents(new MilkNerfListener(plugin), plugin);
     }
 
@@ -107,4 +108,7 @@ public final class MedicineManager implements Module {
     /** Convenience alias of {@link #medicines()}. */
     public Map<String, Medicine> all() { return medicines; }
     public MedicineItemFactory factory() { return factory; }
+
+    /** Live tranquilizer listener (only non-null when the module is enabled). */
+    public TranquilizerListener tranquilizer() { return tranquilizer; }
 }

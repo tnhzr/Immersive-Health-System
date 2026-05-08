@@ -64,6 +64,16 @@ public final class ResourcePackTracker implements Listener {
                 lo, age, hasPack(player));
     }
 
+    /**
+     * Force-mark this player as having the IHS pack loaded. Useful for
+     * forks that ship the pack out of band (modpack / launcher) and
+     * therefore never receive {@code PlayerResourcePackStatusEvent}.
+     */
+    public void markLoaded(Player player) {
+        if (player == null) return;
+        loaded.put(player.getUniqueId(), true);
+    }
+
     @EventHandler
     public void onStatus(PlayerResourcePackStatusEvent e) {
         UUID id = e.getPlayer().getUniqueId();

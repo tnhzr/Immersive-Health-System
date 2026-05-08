@@ -472,8 +472,18 @@ public final class DiseaseManager implements Module {
     }
 
     public void infect(Player target, String diseaseId, int initialScale) {
+        infect(target, diseaseId, initialScale,
+                com.tnhzr.ihs.api.event.IHSPlayerInfectedEvent.InfectionSource.API);
+    }
+
+    public void infect(Player target, String diseaseId, int initialScale,
+                       com.tnhzr.ihs.api.event.IHSPlayerInfectedEvent.InfectionSource source) {
         Disease d = disease(diseaseId);
         if (d == null) return;
+        var event = new com.tnhzr.ihs.api.event.IHSPlayerInfectedEvent(
+                target, diseaseId, source);
+        org.bukkit.Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) return;
         PlayerDiseaseState st = state(target.getUniqueId());
         st.setScale(diseaseId, Math.max(1, initialScale));
     }
@@ -481,16 +491,27 @@ public final class DiseaseManager implements Module {
     public void heal(Player target, String diseaseId) {
         PlayerDiseaseState st = state(target.getUniqueId());
         if (diseaseId == null) {
+            // Snapshot ids before clearing to drive cured events.
+            var ids = new java.util.ArrayList<>(st.infections().keySet());
             st.clearAll();
             // Full reset wipes any lingering disease-applied effects too.
             for (PotionEffect e : new java.util.ArrayList<>(target.getActivePotionEffects())) {
                 target.removePotionEffect(e.getType());
             }
+            for (String id : ids) {
+                org.bukkit.Bukkit.getPluginManager().callEvent(
+                        new com.tnhzr.ihs.api.event.IHSPlayerCuredEvent(target, id));
+            }
         } else {
+            boolean wasInfected = st.scale(diseaseId) > 0;
             st.setScale(diseaseId, 0);
             // Don't strip unrelated potion effects (other diseases, beacons,
             // buff medicines). The disease's own per-stage effects stop being
             // re-applied automatically once the infection is gone.
+            if (wasInfected) {
+                org.bukkit.Bukkit.getPluginManager().callEvent(
+                        new com.tnhzr.ihs.api.event.IHSPlayerCuredEvent(target, diseaseId));
+            }
         }
     }
 

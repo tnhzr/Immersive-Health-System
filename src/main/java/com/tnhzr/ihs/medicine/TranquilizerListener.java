@@ -255,9 +255,19 @@ public final class TranquilizerListener implements Listener {
      * the tranquilizer works in caves, mid-day, the Nether, etc.
      */
     public void applySleepRoutine(Player p, int onsetSeconds, int sleepSeconds) {
+        applySleepRoutine(p, onsetSeconds, sleepSeconds,
+                com.tnhzr.ihs.api.event.IHSPlayerSleptEvent.TranquilizerSource.API);
+    }
+
+    /** Variant exposing the trigger source so the API event can carry it. */
+    public void applySleepRoutine(Player p, int onsetSeconds, int sleepSeconds,
+                                  com.tnhzr.ihs.api.event.IHSPlayerSleptEvent.TranquilizerSource source) {
         if (p == null || !p.isOnline()) return;
         int onsetTicks = Math.max(0, onsetSeconds * 20);
         int sleepTicks = Math.max(20, sleepSeconds * 20);
+        Bukkit.getPluginManager().callEvent(
+                new com.tnhzr.ihs.api.event.IHSPlayerSleptEvent(
+                        p, onsetSeconds, sleepSeconds, source));
         p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS,
                 onsetTicks + 40, 0, true, false, true));
         p.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS,

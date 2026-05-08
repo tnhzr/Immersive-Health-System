@@ -159,11 +159,82 @@
 
 ### Установка
 
-1. Скачайте `immersive-health-system-1.0.0.jar`.
-2. Положите в папку `plugins/` сервера Paper 1.21.8.
+1. Скачайте `immersive-health-system-<версия>.jar`.
+2. Положите в папку `plugins/` сервера Paper 1.20+ (рекомендуется 1.21.x).
 3. Запустите сервер — плагин создаст `plugins/ImmersiveHealthSystem/` со всеми
    конфигами и языковыми файлами.
 4. (По желанию) измените `language: ru` на `en` в `config.yml`.
+
+### Поддерживаемые версии
+
+- **Paper 1.21.8** — основная цель, всё работает «из коробки».
+- **Paper 1.21.0 – 1.21.7** — поддерживается, кастомные item-модели на
+  1.21.0..3 деградируют до `customModelData`.
+- **Paper 1.20.x** — best-effort: лаборатория и медикаменты работают,
+  собственные item-модели могут не показаться в инвентаре без
+  `customModelData`-оверрайдов.
+- **Spigot / Folia / 1.19 и ниже** — НЕ поддерживается.
+
+Полная матрица — [docs/wiki/Compatibility.md](docs/wiki/Compatibility.md).
+
+### Resource pack
+
+IHS поставляется с собственным ресурспаком (текстура лаборатории,
+кастомные модели лекарств, звуки `ihs:cough` / `ihs:sneeze` / `ihs:lab.*`
+и т. д.). Есть **5 способов доставки** клиенту, переключаемых в
+`config.yml`:
+
+```yaml
+resourcepack:
+  installer: auto   # craftengine | itemsadder | nexo | oraxen | manual | none
+  force_overwrite: true
+  craftengine: { target_folder: "resources/immersive_health" }
+  itemsadder:  { namespace: "ihs" }
+  nexo:        { folder: "ihs" }
+  oraxen:      { folder: "ihs" }
+```
+
+| Режим          | Куда копируется пак                                             | Что нужно сделать вручную |
+| -------------- | --------------------------------------------------------------- | ------------------------- |
+| `auto`         | первый из CraftEngine / ItemsAdder / Nexo / Oraxen, иначе manual | —                         |
+| `craftengine`  | `plugins/CraftEngine/<target_folder>/`                          | ничего                    |
+| `itemsadder`   | `plugins/ItemsAdder/contents/<namespace>/resourcepack/`         | `/iazip`                  |
+| `nexo`         | `plugins/Nexo/pack/external_packs/<folder>/`                    | reload Nexo               |
+| `oraxen`       | `plugins/Oraxen/pack/external_packs/<folder>/`                  | reload Oraxen             |
+| `manual`       | `plugins/ImmersiveHealthSystem/resourcepack/`                   | зазиповать и раздать самим|
+| `none`         | _(не копируется)_                                                | использовать свой пак     |
+
+Если пак раздаётся **вне** обычного RP-механизма (через лаунчер,
+модпак, отдельный installer) — поставь
+`symptoms.yml -> resource_pack_detection.assume_loaded: true`, и плагин
+будет считать что у каждого игрока пак уже загружен (а значит выдавать
+кастомные звуки `ihs:cough` / `ihs:sneeze`).
+
+Подробнее — [docs/wiki/Resource-Pack.md](docs/wiki/Resource-Pack.md).
+
+### API для разработчиков
+
+IHS регистрирует публичный сервис `IHSApi` в Bukkit `ServicesManager`:
+
+```java
+RegisteredServiceProvider<IHSApi> rsp =
+        Bukkit.getServicesManager().getRegistration(IHSApi.class);
+IHSApi ihs = rsp.getProvider();
+
+ihs.diseases().infect(player, "tuberculosis", 1.0);
+ItemStack stack = ihs.medicines().itemOf("aspirin", 4);
+ihs.medicines().applyTranquilizerSleep(target, 5, 30);
+boolean hasPack = ihs.resourcePack().hasPack(player);
+```
+
+Доступные сервисы: `DiseaseService`, `MedicineService`,
+`LaboratoryService`, `ResourcePackService`. Бункеровские события
+живут в `com.tnhzr.ihs.api.event.*` (`IHSPlayerInfectedEvent`,
+`IHSPlayerCuredEvent`, `IHSPlayerSleptEvent`,
+`IHSLabSynthesisCompletedEvent`).
+
+Полная документация API — [docs/wiki/Developer-API.md](docs/wiki/Developer-API.md).
+Гайд по форкам — [docs/wiki/Forking.md](docs/wiki/Forking.md).
 
 ### Конфигурация
 
@@ -358,11 +429,80 @@ is configurable — there are no magic numbers in the source.
 
 ### Installation
 
-1. Download `immersive-health-system-1.0.0.jar`.
-2. Drop it into your Paper 1.21.8 `plugins/` folder.
+1. Download `immersive-health-system-<version>.jar`.
+2. Drop it into your Paper 1.20+ (1.21.x recommended) `plugins/` folder.
 3. Start the server — `plugins/ImmersiveHealthSystem/` will be populated
    with config and locale files.
 4. (Optional) switch `language: ru` to `en` in `config.yml`.
+
+### Supported versions
+
+- **Paper 1.21.8** — primary target, fully tested.
+- **Paper 1.21.0 – 1.21.7** — supported. On 1.21.0..3 custom item models
+  fall back to `customModelData`.
+- **Paper 1.20.x** — best-effort: laboratory + medicines work,
+  custom item models may render as fallbacks without
+  `customModelData` overrides.
+- **Spigot / Folia / 1.19 and below** — NOT supported.
+
+Full matrix — [docs/wiki/Compatibility.md](docs/wiki/Compatibility.md).
+
+### Resource pack
+
+IHS ships its own resourcepack (laboratory texture, medicine models,
+`ihs:cough` / `ihs:sneeze` / `ihs:lab.*` sounds, etc). There are **5
+delivery strategies** selectable in `config.yml`:
+
+```yaml
+resourcepack:
+  installer: auto   # craftengine | itemsadder | nexo | oraxen | manual | none
+  force_overwrite: true
+  craftengine: { target_folder: "resources/immersive_health" }
+  itemsadder:  { namespace: "ihs" }
+  nexo:        { folder: "ihs" }
+  oraxen:      { folder: "ihs" }
+```
+
+| Mode           | Where the pack is unpacked                                        | Manual step               |
+| -------------- | ----------------------------------------------------------------- | ------------------------- |
+| `auto`         | first available host (CraftEngine / ItemsAdder / Nexo / Oraxen)   | —                         |
+| `craftengine`  | `plugins/CraftEngine/<target_folder>/`                            | none                      |
+| `itemsadder`   | `plugins/ItemsAdder/contents/<namespace>/resourcepack/`           | `/iazip`                  |
+| `nexo`         | `plugins/Nexo/pack/external_packs/<folder>/`                      | reload Nexo               |
+| `oraxen`       | `plugins/Oraxen/pack/external_packs/<folder>/`                    | reload Oraxen             |
+| `manual`       | `plugins/ImmersiveHealthSystem/resourcepack/`                     | zip + serve yourself      |
+| `none`         | _(skipped)_                                                       | use your own pack         |
+
+If you deliver the pack **out of band** (launcher, modpack, separate
+installer), set `symptoms.yml -> resource_pack_detection.assume_loaded:
+true` so the plugin treats every player as having the pack and uses the
+`ihs:cough` / `ihs:sneeze` custom sounds.
+
+More details — [docs/wiki/Resource-Pack.md](docs/wiki/Resource-Pack.md).
+
+### Developer API
+
+IHS exposes a public service via Bukkit's `ServicesManager`:
+
+```java
+RegisteredServiceProvider<IHSApi> rsp =
+        Bukkit.getServicesManager().getRegistration(IHSApi.class);
+IHSApi ihs = rsp.getProvider();
+
+ihs.diseases().infect(player, "tuberculosis", 1.0);
+ItemStack stack = ihs.medicines().itemOf("aspirin", 4);
+ihs.medicines().applyTranquilizerSleep(target, 5, 30);
+boolean hasPack = ihs.resourcePack().hasPack(player);
+```
+
+Services: `DiseaseService`, `MedicineService`, `LaboratoryService`,
+`ResourcePackService`. Bukkit events live under
+`com.tnhzr.ihs.api.event.*`
+(`IHSPlayerInfectedEvent`, `IHSPlayerCuredEvent`,
+`IHSPlayerSleptEvent`, `IHSLabSynthesisCompletedEvent`).
+
+Full API guide — [docs/wiki/Developer-API.md](docs/wiki/Developer-API.md).
+Forking guide — [docs/wiki/Forking.md](docs/wiki/Forking.md).
 
 ### Configuration
 
