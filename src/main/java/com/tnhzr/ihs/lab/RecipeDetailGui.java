@@ -55,6 +55,8 @@ public final class RecipeDetailGui implements Listener {
     private static final int RESULT_SLOT = 25;
     private static final int BACK_SLOT = 45;
     private static final int META_SLOT = 41;
+    private static final int ADMIN_GRAB_SLOT = 53;
+    private static final String ADMIN_GRAB_PERMISSION = "ihs.admin.testgrab";
 
     private final ImmersiveHealthSystem plugin;
     private final Player viewer;
@@ -97,6 +99,8 @@ public final class RecipeDetailGui implements Listener {
         reserved.add(RESULT_SLOT);
         reserved.add(BACK_SLOT);
         reserved.add(META_SLOT);
+        boolean canGrab = viewer.hasPermission(ADMIN_GRAB_PERMISSION);
+        if (canGrab) reserved.add(ADMIN_GRAB_SLOT);
         for (int s = 0; s < inventory.getSize(); s++) {
             if (!reserved.contains(s)) inventory.setItem(s, pane);
         }
@@ -156,6 +160,22 @@ public final class RecipeDetailGui implements Listener {
             meta.setItemMeta(metaMeta);
         }
         inventory.setItem(META_SLOT, meta);
+        // Admin "test grab" button — perm-gated, gives 1x result item
+        // for free without consuming any ingredients. Useful for
+        // tweaking recipes / verifying medicine effects in-game.
+        if (canGrab) {
+            ItemStack grab = new ItemStack(Material.EMERALD);
+            ItemMeta gm = grab.getItemMeta();
+            if (gm != null) {
+                gm.displayName(plugin.locale().component("lab.recipe_detail.admin_grab")
+                        .decoration(TextDecoration.ITALIC, false));
+                gm.lore(List.of(
+                        plugin.locale().component("lab.recipe_detail.admin_grab_lore")
+                                .decoration(TextDecoration.ITALIC, false)));
+                grab.setItemMeta(gm);
+            }
+            inventory.setItem(ADMIN_GRAB_SLOT, grab);
+        }
     }
 
     private ItemStack buildIngredientItem(LabIngredient ing, MedicineItemFactory mf) {
@@ -247,7 +267,30 @@ public final class RecipeDetailGui implements Listener {
             } else {
                 p.closeInventory();
             }
+            return;
         }
+        if (slot == ADMIN_GRAB_SLOT
+                && e.getWhoClicked() instanceof Player p
+                && p.hasPermission(ADMIN_GRAB_PERMISSION)) {
+            adminGrab(p);
+        }
+    }
+
+    private void adminGrab(Player p) {
+        Medicine med = plugin.medicines() == null ? null
+                : plugin.medicines().medicine(recipe.resultMedicineId());
+        if (med == null) return;
+        MedicineItemFactory mf = plugin.medicines().factory();
+        if (mf == null) return;
+        ItemStack stack = mf.create(med, 1);
+        // Drop overflow at the player's feet so the grab never silently
+        // disappears when their inventory is full.
+        Map<Integer, ItemStack> overflow = p.getInventory().addItem(stack);
+        for (ItemStack leftover : overflow.values()) {
+            p.getWorld().dropItemNaturally(p.getLocation(), leftover);
+        }
+        plugin.locale().send(p, "lab.recipe_detail.admin_grab_done",
+                Map.of("medicine", med.name()));
     }
 
     @EventHandler

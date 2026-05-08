@@ -95,11 +95,12 @@ laboratory:
   # Material the plugin places when a laboratory item is set down.
   # The plugin's resourcepack ships an override at
   #   assets/minecraft/blockstates/note_block.json
-  # that maps note_block[note=0,instrument=harp,powered=false] to the
-  # IHS laboratory model, and the place handler swaps the placed block
-  # to that exact note-block state. The held/inventory item still uses
-  # this material as its base so vanilla clients (no resourcepack)
-  # see something metallic and the block is mined with a pickaxe.
+  # that maps note_block[note=0..3,instrument=harp,powered=false] to the
+  # IHS laboratory model at four cardinal rotations, and the place
+  # handler swaps the placed block to the note-block state matching the
+  # player's facing. The held/inventory item still uses this material
+  # as its base so vanilla clients (no resourcepack) see something
+  # metallic and the block is mined with a pickaxe.
   block_material: BLAST_FURNACE
   # CustomModelData applied to the placeable laboratory item (legacy).
   # New clients (1.21.4+) instead bind to the item-model component below.
@@ -109,6 +110,40 @@ laboratory:
   # how the held/inventory laboratory item gets its custom model without
   # any CraftEngine binding.
   item_model: "ihs:block/laboratory"
+
+  # Laboratory physical block: name, lore and sounds. Everything in this
+  # section is hot-reloaded by /ihs reload; the lab item on the player's
+  # cursor is NOT re-written retroactively — drop & pick back up, or
+  # re-craft, to refresh existing stacks.
+  block:
+    # Display name of the held/placed laboratory item. Supports &-codes.
+    # Empty string -> falls back to the locale's lab.item_name entry.
+    display_name: "&bЛаборатория"
+    # Extra lore lines shown in the tooltip. Empty list = no extra lore.
+    lore:
+      - "&7Мобильная медицинская лаборатория."
+      - "&7Ломается киркой."
+    # Tool tier required to break the placed block. Accepted values:
+    # HAND (anyone), WOODEN, STONE, IRON, DIAMOND, NETHERITE. Breaking
+    # with a weaker tool is cancelled outright (and the "no fuel"
+    # sound plays as feedback).
+    break_tool_tier: STONE
+    # Sounds played by the lab block. Each entry is either a namespaced
+    # key string (e.g. "minecraft:block.metal.place") or an object with
+    # key/volume/pitch. Empty key -> that sound is skipped.
+    sounds:
+      place:    { key: "minecraft:block.metal.place",          volume: 1.0, pitch: 0.9 }
+      break:    { key: "minecraft:block.metal.break",          volume: 1.0, pitch: 0.95 }
+      interact: { key: "minecraft:block.barrel.open",          volume: 0.6, pitch: 1.2 }
+      close:    { key: "minecraft:block.barrel.close",         volume: 0.6, pitch: 1.1 }
+      # Looped ambient while a recipe is actively synthesising.
+      synthesis: { key: "minecraft:block.brewing_stand.brew",  volume: 0.5, pitch: 1.1 }
+      # Tool too weak feedback.
+      denied:    { key: "minecraft:block.anvil.land",          volume: 0.4, pitch: 1.4 }
+    # Ambient synthesis sound tick-period (server ticks). The lab emits
+    # this sound once per interval while {@code activeSecondsRemaining>0}.
+    # 0 disables the ambient entirely.
+    synthesis_tick_period: 20
   # Tick period for the queue/output loop.
   tick_period_ticks: 20
   # Fuel definitions. Each material is consumed instantly when dropped

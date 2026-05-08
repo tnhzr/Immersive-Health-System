@@ -38,3 +38,6 @@ permissions:
   ihs.give:
     description: Use /ihs give to spawn medicine items.
     default: op
+  ihs.admin.testgrab:
+    description: Show the "test grab" button in the recipe detail GUI.
+    default: op

@@ -2,6 +2,8 @@ package com.tnhzr.ihs.lab;
 
 import com.tnhzr.ihs.ImmersiveHealthSystem;
 import com.tnhzr.ihs.module.Module;
+import com.tnhzr.ihs.util.Text;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -38,13 +40,18 @@ public final class LabManager implements Module {
     private NamespacedKey cachedLabItemKey;
     private NamespacedKey cachedLabRecipeKey;
     private Map<Material, Integer> cachedFuelMap = Collections.emptyMap();
+    private final LabSounds sounds;
 
     public LabManager(ImmersiveHealthSystem plugin) {
         this.plugin = plugin;
         this.recipes = new LabRecipeManager(plugin);
         this.cachedLabItemKey = new NamespacedKey(plugin, "lab_block_id");
         this.cachedLabRecipeKey = new NamespacedKey(plugin, "laboratory_block");
+        this.sounds = new LabSounds(plugin);
     }
+
+    /** Returns the laboratory block sound helper. */
+    public LabSounds sounds() { return sounds; }
 
     @Override public String id() { return "laboratory"; }
 
@@ -182,8 +189,25 @@ public final class LabManager implements Module {
         ItemStack stack = new ItemStack(mat);
         ItemMeta meta = stack.getItemMeta();
         if (meta != null) {
-            meta.displayName(plugin.locale().component("lab.item_name")
-                    .decoration(TextDecoration.ITALIC, false));
+            String customName = plugin.configs().main()
+                    .getString("laboratory.block.display_name", "");
+            if (customName != null && !customName.isBlank()) {
+                meta.displayName(Text.component(customName)
+                        .decoration(TextDecoration.ITALIC, false));
+            } else {
+                meta.displayName(plugin.locale().component("lab.item_name")
+                        .decoration(TextDecoration.ITALIC, false));
+            }
+            java.util.List<String> loreLines = plugin.configs().main()
+                    .getStringList("laboratory.block.lore");
+            if (loreLines != null && !loreLines.isEmpty()) {
+                java.util.List<Component> lore = new java.util.ArrayList<>();
+                for (String line : loreLines) {
+                    lore.add(Text.component(line)
+                            .decoration(TextDecoration.ITALIC, false));
+                }
+                meta.lore(lore);
+            }
             int cmd = plugin.configs().main().getInt("laboratory.item_custom_model_data", 9001);
             if (cmd > 0) meta.setCustomModelData(cmd);
             // 1.21.4+ item-model component — binds the placeable lab item
@@ -216,6 +240,43 @@ public final class LabManager implements Module {
     public int maxEnergyCap() {
         return Math.max(1, plugin.configs().main()
                 .getInt("laboratory.fuels.max_energy", 256));
+    }
+
+    /**
+     * Whether the given tool material is at or above the configured
+     * minimum tier required to break a laboratory block. Tool-less
+     * (HAND) is never sufficient unless the configured tier is HAND.
+     */
+    public boolean canBreakLab(ItemStack tool) {
+        String tierStr = plugin.configs().main()
+                .getString("laboratory.block.break_tool_tier", "STONE");
+        int required = pickaxeTier(tierStr);
+        if (required <= 0) return true; // HAND — anyone can break
+        if (tool == null) return false;
+        Material m = tool.getType();
+        // Only pickaxes count.
+        int have = switch (m) {
+            case WOODEN_PICKAXE, GOLDEN_PICKAXE -> 1;
+            case STONE_PICKAXE -> 2;
+            case IRON_PICKAXE -> 3;
+            case DIAMOND_PICKAXE -> 4;
+            case NETHERITE_PICKAXE -> 5;
+            default -> 0;
+        };
+        return have >= required;
+    }
+
+    private int pickaxeTier(String name) {
+        if (name == null) return 2;
+        return switch (name.trim().toUpperCase()) {
+            case "HAND", "NONE" -> 0;
+            case "WOOD", "WOODEN", "GOLD", "GOLDEN" -> 1;
+            case "STONE" -> 2;
+            case "IRON" -> 3;
+            case "DIAMOND" -> 4;
+            case "NETHERITE" -> 5;
+            default -> 2;
+        };
     }
 
     public boolean isLabItem(ItemStack stack) {
@@ -312,7 +373,20 @@ public final class LabManager implements Module {
         int newSec = Math.max(0,
                 lab.activeSecondsRemaining() - Math.max(1, periodTicks / 20));
         lab.setActiveSecondsRemaining(newSec);
-        if (newSec > 0) return;
+        // Ambient synthesis sound while the recipe is still cooking.
+        // synthesis_tick_period is expressed in server ticks, but we tick
+        // here once per laboratory.tick_period_ticks. Play whenever we're
+        // still cooking and the period elapsed since last emission —
+        // simplified to "every tickOne while cooking" when the configured
+        // period equals the lab tick period (the default).
+        if (newSec > 0) {
+            int synthPeriod = plugin.configs().main()
+                    .getInt("laboratory.block.synthesis_tick_period", 20);
+            if (synthPeriod > 0) {
+                sounds.play(lab.location().clone().add(0.5, 0.5, 0.5), "synthesis");
+            }
+            return;
+        }
 
         LabRecipe recipe = recipes.recipes().get(lab.activeRecipeId());
         if (recipe == null) {

@@ -28,7 +28,12 @@ public final class MedicineManager implements Module {
     @Override
     public void enable() {
         load();
-        Bukkit.getPluginManager().registerEvents(new MedicineConsumeListener(plugin, this), plugin);
+        // Tranquilizer needs to share its sleep routine with the
+        // consume listener, so build it first and pass it down.
+        TranquilizerListener tranq = new TranquilizerListener(plugin, this);
+        Bukkit.getPluginManager().registerEvents(
+                new MedicineConsumeListener(plugin, this, tranq), plugin);
+        Bukkit.getPluginManager().registerEvents(tranq, plugin);
         Bukkit.getPluginManager().registerEvents(new MilkNerfListener(plugin), plugin);
     }
 
@@ -76,9 +81,14 @@ public final class MedicineManager implements Module {
             type = switch (t) {
                 case "effect_clear" -> Medicine.Type.EFFECT_CLEAR;
                 case "buff" -> Medicine.Type.BUFF;
+                case "tranquilizer" -> Medicine.Type.TRANQUILIZER;
                 default -> Medicine.Type.CURE;
             };
         }
+
+        int sleepSec = data != null ? data.getInt("sleep_seconds", 30) : 30;
+        int onsetSec = data != null ? data.getInt("onset_seconds", 5)  : 5;
+        boolean revealLore = data != null && data.getBoolean("reveal_in_lore", false);
 
         return new Medicine(
                 id, mat, cmd, itemModel, name, s.getStringList("lore"),
@@ -87,7 +97,8 @@ public final class MedicineManager implements Module {
                 data != null ? data.getInt("heal_points", 0) : 0,
                 data != null ? data.getInt("daily_limit", 1) : 1,
                 data != null ? data.getStringList("clears_potion_effects") : null,
-                data != null ? data.getStringList("apply_potion_effects") : null
+                data != null ? data.getStringList("apply_potion_effects") : null,
+                sleepSec, onsetSec, revealLore
         );
     }
 

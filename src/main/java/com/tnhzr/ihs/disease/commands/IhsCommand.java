@@ -25,7 +25,7 @@ public final class IhsCommand implements CommandExecutor, TabCompleter {
 
     private static final List<String> SUBCOMMANDS =
             Arrays.asList("check", "inject", "heal", "modify", "menu", "give",
-                    "tremor", "help", "reload");
+                    "tremor", "rpstatus", "help", "reload");
 
     private final ImmersiveHealthSystem plugin;
 
@@ -76,6 +76,7 @@ public final class IhsCommand implements CommandExecutor, TabCompleter {
             case "modify" -> handleModify(sender, args);
             case "give" -> handleGive(sender, args);
             case "tremor" -> handleTremor(sender, args);
+            case "rpstatus" -> handleRpStatus(sender, args);
             default -> sendHelp(sender);
         }
         return true;
@@ -126,6 +127,31 @@ public final class IhsCommand implements CommandExecutor, TabCompleter {
      * Usage: {@code /ihs tremor <player> [seconds]}. Default 10 s.
      * {@code /ihs tremor <player> 0} clears any active forced tremor.
      */
+    /**
+     * Debug subcommand: prints {@code ResourcePackTracker} state for the
+     * named player (or the sender themself when run without args).
+     * Useful for diagnosing why a player isn't getting the {@code ihs:}
+     * cough/sneeze sounds.
+     */
+    private void handleRpStatus(CommandSender s, String[] args) {
+        Player target;
+        if (args.length >= 2) {
+            OfflinePlayer off = resolve(args[1]);
+            target = off != null ? off.getPlayer() : null;
+        } else if (s instanceof Player p) {
+            target = p;
+        } else {
+            Text.send(s, "&cUsage: /ihs rpstatus <player>");
+            return;
+        }
+        if (target == null) {
+            plugin.locale().send(s, "common.player_not_found");
+            return;
+        }
+        Text.send(s, "&8» &7" + target.getName() + ": &f"
+                + plugin.resourcePacks().describe(target));
+    }
+
     private void handleTremor(CommandSender s, String[] args) {
         if (args.length < 2) {
             Text.send(s, "&cUsage: /ihs tremor <player> [seconds]");

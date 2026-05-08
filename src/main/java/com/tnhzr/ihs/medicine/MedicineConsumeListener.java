@@ -18,10 +18,14 @@ public final class MedicineConsumeListener implements Listener {
 
     private final ImmersiveHealthSystem plugin;
     private final MedicineManager manager;
+    private final TranquilizerListener tranq;
 
-    public MedicineConsumeListener(ImmersiveHealthSystem plugin, MedicineManager manager) {
+    public MedicineConsumeListener(ImmersiveHealthSystem plugin,
+                                   MedicineManager manager,
+                                   TranquilizerListener tranq) {
         this.plugin = plugin;
         this.manager = manager;
+        this.tranq = tranq;
     }
 
     @EventHandler
@@ -69,6 +73,7 @@ public final class MedicineConsumeListener implements Listener {
             case CURE -> applyCure(p, m, state);
             case EFFECT_CLEAR -> applyEffectClear(p, m);
             case BUFF -> applyBuff(p, m);
+            case TRANQUILIZER -> tranq.applySleepRoutine(p, m.onsetSeconds(), m.sleepSeconds());
         }
 
         plugin.locale().send(p, "medicine.used", Map.of("medicine", m.name()));

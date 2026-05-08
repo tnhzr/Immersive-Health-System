@@ -28,6 +28,7 @@ public final class SymptomConfig {
     private final Map<String, EventSettings> cache = new LinkedHashMap<>();
     private boolean resourcePackDetectionEnabled = true;
     private long resourcePackGracePeriodMs = 3000L;
+    private boolean resourcePackAssumeLoaded = false;
 
     public SymptomConfig(ImmersiveHealthSystem plugin) {
         this.plugin = plugin;
@@ -51,6 +52,8 @@ public final class SymptomConfig {
                 "resource_pack_detection.enabled", true);
         this.resourcePackGracePeriodMs = file.getLong(
                 "resource_pack_detection.grace_period_ms", 3000L);
+        this.resourcePackAssumeLoaded = file.getBoolean(
+                "resource_pack_detection.assume_loaded", false);
     }
 
     public boolean resourcePackDetectionEnabled() {
@@ -59,6 +62,16 @@ public final class SymptomConfig {
 
     public long resourcePackGracePeriodMs() {
         return resourcePackGracePeriodMs;
+    }
+
+    /**
+     * If {@code true}, the plugin treats every player as if they had
+     * the IHS resource pack loaded — useful when admins distribute the
+     * pack out-of-band (e.g. via a launcher mod-pack) and the
+     * server's own pack-status detection therefore can't see it.
+     */
+    public boolean resourcePackAssumeLoaded() {
+        return resourcePackAssumeLoaded;
     }
 
     public EventSettings event(String id) {

@@ -17,11 +17,13 @@ public final class Disease {
     private final String cureType;
     private final double infectionChance;
     private final int tremorThreshold;
+    private final String deathMessage;
     private final Map<String, TransmissionSettings> transmissions;
     private final List<Stage> stages;
 
     public Disease(String id, String name, Type type, String cureType,
                    double infectionChance, int tremorThreshold,
+                   String deathMessage,
                    Map<String, TransmissionSettings> transmissions,
                    List<Stage> stages) {
         this.id = id;
@@ -30,6 +32,7 @@ public final class Disease {
         this.cureType = cureType;
         this.infectionChance = infectionChance;
         this.tremorThreshold = tremorThreshold;
+        this.deathMessage = deathMessage;
         this.transmissions = transmissions == null ? Collections.emptyMap() : transmissions;
         this.stages = stages == null ? Collections.emptyList() : stages;
     }
@@ -40,6 +43,10 @@ public final class Disease {
     public String cureType() { return cureType; }
     public double infectionChance() { return infectionChance; }
     public int tremorThreshold() { return tremorThreshold; }
+    /** Custom chat death message template. Supports {@code %player%},
+     *  {@code %disease%} placeholders and {@code &}-color codes. {@code null}
+     *  / empty leaves vanilla death message untouched. */
+    public String deathMessage() { return deathMessage; }
     public Map<String, TransmissionSettings> transmissions() { return transmissions; }
     public List<Stage> stages() { return stages; }
 

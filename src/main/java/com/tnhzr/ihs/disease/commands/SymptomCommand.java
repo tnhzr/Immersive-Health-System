@@ -61,6 +61,7 @@ public final class SymptomCommand implements CommandExecutor, TabCompleter {
             // Fire a "blank" event so the cosmetic part still plays.
             disease = new Disease("debug", "Debug",
                     Disease.Type.LOCAL, "general", 0.0, Disease.TREMOR_DEFAULT,
+                    null,
                     java.util.Map.of(event, new TransmissionSettings(0.0, 0.0, 0.0)),
                     java.util.List.of());
         }
