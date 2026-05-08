@@ -46,6 +46,7 @@ public final class DiseaseLoader {
         int tremor = sec.contains("tremor_threshold")
                 ? sec.getInt("tremor_threshold")
                 : Disease.TREMOR_DEFAULT;
+        String deathMessage = sec.getString("death_message", null);
 
         Map<String, TransmissionSettings> trans = new LinkedHashMap<>();
         ConfigurationSection ts = sec.getConfigurationSection("transmission");
@@ -78,7 +79,7 @@ public final class DiseaseLoader {
             }
         }
 
-        return new Disease(id, name, type, cureType, chance, tremor, trans, stages);
+        return new Disease(id, name, type, cureType, chance, tremor, deathMessage, trans, stages);
     }
 
     private int[] parseRange(String s) {

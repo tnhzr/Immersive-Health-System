@@ -5,6 +5,7 @@ infections:
     type: global
     cure_type: viral
     infection_chance: 0.1
+    death_message: "&7%player% скончался от осложнений простуды"
     transmission:
       cough:
         radius: 6.0
@@ -40,6 +41,7 @@ infections:
     type: global
     cure_type: bacterial
     infection_chance: 0.2
+    death_message: "&7%player% умер от туберкулёза"
     transmission:
       cough:
         radius: 6.0
@@ -75,6 +77,7 @@ infections:
     type: global
     cure_type: viral
     infection_chance: 0.1
+    death_message: "&7%player% погиб от кори"
     transmission:
       cough:
         radius: 10.0

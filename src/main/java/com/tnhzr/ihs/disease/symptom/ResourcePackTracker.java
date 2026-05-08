@@ -42,12 +42,36 @@ public final class ResourcePackTracker implements Listener {
      */
     public boolean hasPack(Player player) {
         if (!plugin.symptoms().resourcePackDetectionEnabled()) return false;
+        // Override knob for admins who deliver the pack out-of-band.
+        if (plugin.symptoms().resourcePackAssumeLoaded()) return true;
         UUID id = player.getUniqueId();
         if (loaded.getOrDefault(id, false)) return true;
         Long ts = acceptedAt.get(id);
         if (ts == null) return false;
         long grace = plugin.symptoms().resourcePackGracePeriodMs();
         return grace > 0 && System.currentTimeMillis() - ts >= grace;
+    }
+
+    /** Snapshot of the per-player tracker state, for the
+     *  {@code /ihs rpstatus} debug command. */
+    public String describe(Player player) {
+        UUID id = player.getUniqueId();
+        boolean lo = loaded.getOrDefault(id, false);
+        Long ts   = acceptedAt.get(id);
+        long age  = ts == null ? -1L : System.currentTimeMillis() - ts;
+        return String.format(
+                "loaded=%s accepted_age_ms=%d hasPack=%s",
+                lo, age, hasPack(player));
+    }
+
+    /**
+     * Force-mark this player as having the IHS pack loaded. Useful for
+     * forks that ship the pack out of band (modpack / launcher) and
+     * therefore never receive {@code PlayerResourcePackStatusEvent}.
+     */
+    public void markLoaded(Player player) {
+        if (player == null) return;
+        loaded.put(player.getUniqueId(), true);
     }
 
     @EventHandler

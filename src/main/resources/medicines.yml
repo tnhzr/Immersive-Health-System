@@ -78,18 +78,22 @@ medicines:
       daily_limit: 1
 
   tranquilizer:
-    material: GOLDEN_APPLE
+    material: HONEY_BOTTLE
     custom_model_data: 1007
     name: "&cТранквилизатор"
     lore:
       - "&7Препарат для мгновенного усыпления."
+      - "&7Можно выпить, добавить в еду или нанести на снаряд."
     medicine_data:
-      type: buff
-      apply_potion_effects:
-        - "BLINDNESS:0:120"
-        - "SLOWNESS:10:120"
-        - "WEAKNESS:10:120"
+      type: tranquilizer
       daily_limit: 1
+      # Длительность принудительного сна, секунд (применяется к игрокам и мобам).
+      sleep_seconds: 30
+      # Слепота / задержка перед "засыпанием" (секунд).
+      onset_seconds: 5
+      # Если true — лекарство, добавленное в еду или на снаряд, оставляет
+      # явную запись в lore ("Содержит транквилизатор"). False скрывает.
+      reveal_in_lore: false
 
   panacea_lav14:
     material: GOLDEN_APPLE

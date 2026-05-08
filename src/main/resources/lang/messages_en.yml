@@ -57,6 +57,7 @@ medicine:
 lab:
   item_name: "&aLaboratory"
   no_fuel: "&cNo fuel."
+  tool_too_weak: "&cYou need a pickaxe to break the laboratory."
   queue_full: "&cQueue is busy with another recipe."
   no_recipe: "&cInvalid recipe."
   queue_cancelled: "&aSynthesis cancelled — ingredients refunded."
@@ -110,6 +111,9 @@ lab:
     meta_time: "&7Craft time: &a{seconds}s"
     result_header: "&8» &7Synthesis result"
     result_time: "&7Craft time: &a{seconds}s"
+    admin_grab: "&e⚡ Test grab"
+    admin_grab_lore: "&7Take the result without spending ingredients."
+    admin_grab_done: "&a{medicine} &agranted to your inventory."
     ingredient_name_vanilla: "&f{material} &7×&a{amount}"
     ingredient_name_custom: "&f{medicine} &7×&a{amount}"
     ingredient_option: "&8• &7{source}: &f{id}"

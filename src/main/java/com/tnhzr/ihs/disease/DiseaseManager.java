@@ -10,6 +10,8 @@ import com.tnhzr.ihs.module.Module;
 import com.tnhzr.ihs.util.Text;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -30,6 +32,10 @@ public final class DiseaseManager implements Module {
     private final TransmissionEvents transmissionEvents;
     private final Map<UUID, PlayerDiseaseState> states = new ConcurrentHashMap<>();
     private final Map<UUID, Long> spitCooldown = new ConcurrentHashMap<>();
+    /** Latest disease id that triggered a stage "kill" action for a player.
+     *  Read by the death listener so we can swap the vanilla death message
+     *  for a disease-specific one (e.g. "Tannhauser умер от туберкулёза"). */
+    private final Map<UUID, String> lastKillingDisease = new ConcurrentHashMap<>();
     /** Players currently being shown the vanilla freezing visual as a
      *  tremor symptom. Tracked so we can clear {@link Player#setFreezeTicks(int)}
      *  the moment the symptom stops or the player quits. */
@@ -60,6 +66,8 @@ public final class DiseaseManager implements Module {
                 .getInt("disease.tremor_threshold", 50);
 
         Bukkit.getPluginManager().registerEvents(new PlayerLifecycleListener(this), plugin);
+        Bukkit.getPluginManager().registerEvents(
+                new com.tnhzr.ihs.disease.listeners.DiseaseDeathListener(plugin), plugin);
 
         IhsCommand exec = new IhsCommand(plugin);
         if (plugin.getCommand("ihs") != null) {
@@ -148,18 +156,17 @@ public final class DiseaseManager implements Module {
     }
 
     /**
-     * Player tremor: every tick, push any player whose worst infection
-     * scale exceeds the (per-disease or global) tremor threshold into
-     * the vanilla "freezing" visual state. This re-uses the existing
-     * client-side render that powdered-snow uses (icy vignette + body
-     * jitter) without applying real freeze damage — the player isn't
-     * inside powdered-snow so {@code Entity#hurt} never fires.
+     * Player tremor: every tick, scan online players whose worst infection
+     * scale exceeds the (per-disease or global) tremor threshold and emit
+     * a small particle burst around them as a purely cosmetic shaking
+     * effect.
      *
-     * <p>Why this approach: rotation-based jitter (an earlier
-     * implementation) interfered with player aim and required careful
-     * delta-tracking to avoid cumulative drift. The freezing visual is
-     * pure client-side rendering and never touches the player's actual
-     * yaw/pitch.</p>
+     * <p>This implementation deliberately avoids {@code setFreezeTicks}:
+     * the vanilla freezing state pulls in the icy-vignette overlay and
+     * the slowdown applied while {@code isFullyFrozen()}, both of which
+     * we want gone. Particles are 100% client-side render with zero
+     * gameplay side effects — the affected player is otherwise
+     * indistinguishable from a healthy one mechanically.</p>
      */
     private void startTremorTicker() {
         tremorTask = new BukkitRunnable() {
@@ -207,27 +214,23 @@ public final class DiseaseManager implements Module {
             revertTremor(p);
             return;
         }
-        // Re-arm the freeze visual every tick. Vanilla decays freezeTicks
-        // by 2 per tick (or 1 with leather armor) while the player is
-        // outside of powdered snow, and the freezing vignette only
-        // renders when {@code freezeTicks >= maxFreezeTicks}. We push
-        // well above the cap so that even after a tick of decay the
-        // value is still over the threshold — setting exactly to max
-        // can briefly drop below on the very next tick before our task
-        // re-arms it, causing the overlay to flicker off.
-        //
-        // The +1/-1 oscillation also guarantees an entity-metadata
-        // broadcast every tick: ProtocolLib/Paper coalesce identical
-        // consecutive values, so a flat-line setter could fail to
-        // propagate to the client at all.
+        // Pure-visual tremor. Spawn a tiny WHITE_ASH burst around the
+        // player's torso every tick — visible to everyone, no movement
+        // slowdown, no vignette, no damage. We deliberately do NOT touch
+        // setFreezeTicks here so vanilla powder-snow mechanics keep
+        // working normally for everyone (including the diseased player).
+        Location at = p.getLocation().add(0.0, 1.0, 0.0);
         try {
-            int max = p.getMaxFreezeTicks();
-            int target = max + 20 + (int) (now & 1L);
-            p.setFreezeTicks(target);
-            tremorActive.add(p.getUniqueId());
+            p.getWorld().spawnParticle(Particle.WHITE_ASH, at,
+                    4, 0.35, 0.6, 0.35, 0.0);
         } catch (Throwable ignored) {
-            // Older API: setFreezeTicks not supported. Silently no-op.
+            // Older clients may not have WHITE_ASH — fall back to SMOKE.
+            try {
+                p.getWorld().spawnParticle(Particle.SMOKE, at,
+                        2, 0.25, 0.4, 0.25, 0.0);
+            } catch (Throwable ignored2) { /* give up silently */ }
         }
+        tremorActive.add(p.getUniqueId());
     }
 
     /**
@@ -253,18 +256,20 @@ public final class DiseaseManager implements Module {
     }
 
     /**
-     * Clears the freezing visual we applied as a tremor. Safe to call
-     * when the player has no active tremor (no-op). Public so the
-     * lifecycle listener can call it on quit before the freeze state
-     * is persisted.
+     * Clears any tremor flag for the given player. The current
+     * implementation only emits transient particles, so there's no
+     * client-side state to undo — we just drop the bookkeeping entry.
+     * Kept public for the lifecycle listener and for forwards-compat
+     * with future visual approaches that may need cleanup.
      */
     public void revertTremor(Player p) {
         if (!tremorActive.remove(p.getUniqueId())) return;
+        // Defensive: legacy installs may have left freezeTicks pinned
+        // at the cap from the previous freeze-based implementation.
+        // Reset once so upgraded servers don't see lingering vignettes.
         try {
-            p.setFreezeTicks(0);
-        } catch (Throwable ignored) {
-            // setFreezeTicks not supported — nothing else we can do.
-        }
+            if (p.getFreezeTicks() > 0) p.setFreezeTicks(0);
+        } catch (Throwable ignored) { /* older API — no-op */ }
     }
 
     /**
@@ -425,23 +430,38 @@ public final class DiseaseManager implements Module {
             if (death != null) {
                 for (String t : death.titles()) p.showTitle(net.kyori.adventure.title.Title.title(
                         Text.component(t), Component.empty()));
-                executeActions(p, death.actions());
+                executeActions(p, death.actions(), e.getKey());
             }
             state.deathActionsFired().add(e.getKey());
         }
     }
 
-    private void executeActions(Player p, List<String> actions) {
+    private void executeActions(Player p, List<String> actions, String diseaseId) {
         if (actions == null) return;
         for (String action : actions) {
             switch (action.toLowerCase()) {
-                case "kill" -> p.setHealth(0.0);
+                case "kill" -> {
+                    // Remember which disease pushed this player into death
+                    // so the death listener can pick the configured
+                    // disease.death_message (if any) for chat broadcast.
+                    if (diseaseId != null) {
+                        lastKillingDisease.put(p.getUniqueId(), diseaseId);
+                    }
+                    p.setHealth(0.0);
+                }
                 case "spawn_zombie" -> {
                     p.getWorld().spawnEntity(p.getLocation(), org.bukkit.entity.EntityType.ZOMBIE);
                 }
                 default -> plugin.getLogger().warning("Unknown stage action: " + action);
             }
         }
+    }
+
+    /** Removes (and returns) the disease that last triggered a kill action
+     *  for the given player. Used by the death listener exactly once per
+     *  death event — returning to {@code null} on subsequent calls. */
+    public String consumeLastKillingDisease(UUID id) {
+        return lastKillingDisease.remove(id);
     }
 
     public boolean tryInfect(Player target, Disease disease, double chancePercent) {
@@ -452,8 +472,18 @@ public final class DiseaseManager implements Module {
     }
 
     public void infect(Player target, String diseaseId, int initialScale) {
+        infect(target, diseaseId, initialScale,
+                com.tnhzr.ihs.api.event.IHSPlayerInfectedEvent.InfectionSource.API);
+    }
+
+    public void infect(Player target, String diseaseId, int initialScale,
+                       com.tnhzr.ihs.api.event.IHSPlayerInfectedEvent.InfectionSource source) {
         Disease d = disease(diseaseId);
         if (d == null) return;
+        var event = new com.tnhzr.ihs.api.event.IHSPlayerInfectedEvent(
+                target, diseaseId, source);
+        org.bukkit.Bukkit.getPluginManager().callEvent(event);
+        if (event.isCancelled()) return;
         PlayerDiseaseState st = state(target.getUniqueId());
         st.setScale(diseaseId, Math.max(1, initialScale));
     }
@@ -461,16 +491,27 @@ public final class DiseaseManager implements Module {
     public void heal(Player target, String diseaseId) {
         PlayerDiseaseState st = state(target.getUniqueId());
         if (diseaseId == null) {
+            // Snapshot ids before clearing to drive cured events.
+            var ids = new java.util.ArrayList<>(st.infections().keySet());
             st.clearAll();
             // Full reset wipes any lingering disease-applied effects too.
             for (PotionEffect e : new java.util.ArrayList<>(target.getActivePotionEffects())) {
                 target.removePotionEffect(e.getType());
             }
+            for (String id : ids) {
+                org.bukkit.Bukkit.getPluginManager().callEvent(
+                        new com.tnhzr.ihs.api.event.IHSPlayerCuredEvent(target, id));
+            }
         } else {
+            boolean wasInfected = st.scale(diseaseId) > 0;
             st.setScale(diseaseId, 0);
             // Don't strip unrelated potion effects (other diseases, beacons,
             // buff medicines). The disease's own per-stage effects stop being
             // re-applied automatically once the infection is gone.
+            if (wasInfected) {
+                org.bukkit.Bukkit.getPluginManager().callEvent(
+                        new com.tnhzr.ihs.api.event.IHSPlayerCuredEvent(target, diseaseId));
+            }
         }
     }
 

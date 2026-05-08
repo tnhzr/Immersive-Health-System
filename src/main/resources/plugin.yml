@@ -1,10 +1,10 @@
 name: ImmersiveHealthSystem
 version: ${project.version}
 main: com.tnhzr.ihs.ImmersiveHealthSystem
-api-version: '1.21'
+api-version: '1.20'
 author: tnhzr
 description: Modular disease, medicine and laboratory system.
-softdepend: [CraftEngine]
+softdepend: [CraftEngine, ItemsAdder, Nexo, Oraxen]
 commands:
   ihs:
     description: Root command for the Immersive Health System.
@@ -37,4 +37,7 @@ permissions:
     default: op
   ihs.give:
     description: Use /ihs give to spawn medicine items.
+    default: op
+  ihs.admin.testgrab:
+    description: Show the "test grab" button in the recipe detail GUI.
     default: op

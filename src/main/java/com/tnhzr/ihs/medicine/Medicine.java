@@ -7,7 +7,7 @@ import java.util.List;
 
 public final class Medicine {
 
-    public enum Type { CURE, EFFECT_CLEAR, BUFF }
+    public enum Type { CURE, EFFECT_CLEAR, BUFF, TRANQUILIZER }
 
     private final String id;
     private final Material material;
@@ -23,10 +23,15 @@ public final class Medicine {
     private final List<String> clearsPotionEffects;
     private final List<String> applyPotionEffects;
 
+    private final int sleepSeconds;
+    private final int onsetSeconds;
+    private final boolean revealInLore;
+
     public Medicine(String id, Material material, int customModelData, String itemModel,
                     String name, List<String> lore,
                     Type type, List<String> curesInfections, int healPoints, int dailyLimit,
-                    List<String> clearsPotionEffects, List<String> applyPotionEffects) {
+                    List<String> clearsPotionEffects, List<String> applyPotionEffects,
+                    int sleepSeconds, int onsetSeconds, boolean revealInLore) {
         this.id = id;
         this.material = material;
         this.customModelData = customModelData;
@@ -39,6 +44,9 @@ public final class Medicine {
         this.dailyLimit = dailyLimit;
         this.clearsPotionEffects = clearsPotionEffects == null ? Collections.emptyList() : clearsPotionEffects;
         this.applyPotionEffects = applyPotionEffects == null ? Collections.emptyList() : applyPotionEffects;
+        this.sleepSeconds = sleepSeconds;
+        this.onsetSeconds = onsetSeconds;
+        this.revealInLore = revealInLore;
     }
 
     public String id() { return id; }
@@ -54,4 +62,10 @@ public final class Medicine {
     public int dailyLimit() { return dailyLimit; }
     public List<String> clearsPotionEffects() { return clearsPotionEffects; }
     public List<String> applyPotionEffects() { return applyPotionEffects; }
+    /** Forced-sleep duration in seconds. Used by the tranquilizer type. */
+    public int sleepSeconds() { return sleepSeconds; }
+    /** Onset delay (blindness window) in seconds before forced sleep. */
+    public int onsetSeconds() { return onsetSeconds; }
+    /** Whether laced food / coated arrows should announce themselves in item lore. */
+    public boolean revealInLore() { return revealInLore; }
 }

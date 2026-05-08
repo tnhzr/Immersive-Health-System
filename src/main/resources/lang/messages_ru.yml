@@ -58,6 +58,7 @@ medicine:
 lab:
   item_name: "&aЛаборатория"
   no_fuel: "&cНет топлива."
+  tool_too_weak: "&cНужна кирка для сноса лаборатории."
   queue_full: "&cОчередь занята другим рецептом."
   no_recipe: "&cНевалидный рецепт."
   queue_cancelled: "&aСинтез отменён, ингредиенты возвращены."
@@ -111,6 +112,9 @@ lab:
     meta_time: "&7Время крафта: &a{seconds} с."
     result_header: "&8» &7Результат синтеза"
     result_time: "&7Время крафта: &a{seconds} с."
+    admin_grab: "&e⚡ Тестовая выдача"
+    admin_grab_lore: "&7Получить препарат без затрат ингредиентов."
+    admin_grab_done: "&aПрепарат &f{medicine} &aвыдан в инвентарь."
     ingredient_name_vanilla: "&f{material} &7×&a{amount}"
     ingredient_name_custom: "&f{medicine} &7×&a{amount}"
     ingredient_option: "&8• &7{source}: &f{id}"

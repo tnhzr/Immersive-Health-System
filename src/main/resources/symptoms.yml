@@ -27,6 +27,14 @@ resource_pack_detection:
   # пака нет. 0 = не ждать (ACCEPTED сразу засчитывается).
   grace_period_ms: 3000
 
+  # Если ваш сервер раздаёт IHS-пак ВНЕ обычного RP-механизма (через клиентский
+  # модпак, через CraftEngine, отдельный setup на лаунчере и т.д.), события
+  # PlayerResourcePackStatusEvent НЕ срабатывают и плагин думает что пака нет.
+  # Поставь true чтобы плагин считал что у каждого игрока пак уже загружен и
+  # всегда выдавал кастомные звуки (ihs:cough / ihs:sneeze).
+  # Дебаг: /ihs rpstatus <player> покажет текущее состояние трекера.
+  assume_loaded: false
+
 events:
 
   cough:
